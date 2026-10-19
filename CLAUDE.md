@@ -1,6 +1,6 @@
 # claude-setup
 
-A public, general-purpose Claude Code setup: a small set of agents, skills and hooks that work in any project. This file holds the rules for working on this repo itself.
+The owner's personal Claude Code setup, published as a public repo: their own agents, skills and hooks, plus selected public skills and plugins under open licenses. This file holds the rules for working on this repo itself.
 
 ## Principles
 
@@ -13,12 +13,12 @@ These are settled. Do not change them without the owner's explicit approval.
 3. **Few agents, used on purpose.** Every agent's description is loaded into every session, so each extra agent costs context. Add an agent only when it will really be used. Prefer explicit calls over "use proactively" descriptions.
 4. **Cheap models for cheap work.** Opus plans (as a subagent, so the main session stays on Sonnet and never switches models), Sonnet implements and reviews, Haiku searches. Every agent sets both `model` and `effort`.
 5. **Review agents are read-only.** They get only read tools. If they have Bash, it is limited to `git status`, `git diff` and `git log`.
-6. **Reuse from ECC is allowed, with attribution.** [affaan-m/ecc](https://github.com/affaan-m/ecc) (MIT) is the main source of inspiration. Its files may be copied as they are, copied and adapted, or used only as an idea. Every copied or adapted file must:
-   - be adapted to principles 1 to 5 (generic, reads project rules, explicit `model` and `effort`, no stack assumptions such as npm, eslint, jest or PostgreSQL, no "MUST BE USED" / "PROACTIVELY" descriptions unless intended);
-   - keep a note at the top saying where it came from (ECC path and commit);
-   - be listed in `UPSTREAM.md` (ECC path, commit, status: copied / adapted).
+6. **Public work is reused only under its license, with attribution.** Agents, skills and rules from public projects under an open license (MIT, Apache-2.0 and similar) may be:
+   - **copied unchanged** as third-party skills, through `scripts/update-third-party-skills.sh` (see Notes);
+   - **adapted** into this repo's own files. An adapted file follows principles 1 to 5 (generic, reads project rules, explicit `model` and `effort`, no stack assumptions, no "MUST BE USED" / "PROACTIVELY" descriptions unless intended), keeps a note at the top with its source path and commit, and is listed in `UPSTREAM.md`;
+   - **used as an idea** only, listed in `UPSTREAM.md` for transparency.
 
-   ECC's license is reproduced in `THIRD_PARTY_NOTICES.md`. A few ECC subfolders carry their own license; check it before taking anything from them.
+   Every source's license text goes into `THIRD_PARTY_NOTICES.md`. Check folder-level licenses too, some repos mix licenses.
 
 ## Rules for this repo
 

@@ -1,6 +1,6 @@
 # claude-setup
 
-A small, personal Claude Code setup: a handful of general-purpose agents, skills and hooks that work in any project.
+My personal Claude Code setup: my own agents, skills and hooks, plus selected public skills and plugins under open licenses. Everything is generic and works in any project.
 
 > **Status: work in progress (WIP).** Usable, but agents and skills are still being tuned on real tasks. Expect changes. See [Known issues](#known-issues).
 
@@ -87,6 +87,8 @@ Copy what you need from `templates/project/` into the project:
 
 ## Skills
 
+### My skills
+
 | Skill | What it does |
 |---|---|
 | `feature-workflow` | Clarify, plan with `planner`, implement, test, review. |
@@ -94,7 +96,7 @@ Copy what you need from `templates/project/` into the project:
 
 ### Third-party skills
 
-Copied unchanged from their authors' repositories, each with its license in its folder. The exact commits are in `scripts/third-party-skills.lock`. Update them with `scripts/update-third-party-skills.sh` (all, or name the skills to update), then review the diff.
+Public skills under open licenses, copied unchanged from their authors' repositories, each with its license in its folder. The exact commits are in `scripts/third-party-skills.lock`. Update them with `scripts/update-third-party-skills.sh` (all, or name the skills to update), then review the diff.
 
 | Source | Skills | License |
 |---|---|---|
