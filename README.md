@@ -103,8 +103,6 @@ Copied unchanged from their authors' repositories, each with its license in its 
 | [vercel-labs/skills](https://github.com/vercel-labs/skills) | `find-skills` | MIT |
 | [NVIDIA/skillspector](https://github.com/NVIDIA/skillspector) | `skill-inspector` (full scans need the `skillspector` CLI, installed by `install-plugins.sh`) | Apache-2.0 |
 
-`full-output-enforcement` was removed from taste-skill upstream and is pinned to the last commit that has it.
-
 ## Plugins
 
 Plugins are not copied into this repo. `scripts/install-plugins.sh` installs them from their own marketplaces, so they update the usual way.
@@ -120,18 +118,6 @@ Plugins are not copied into this repo. `scripts/install-plugins.sh` installs the
 | Hook | What it does |
 |---|---|
 | `guard-heavy-commands.sh` | Blocks heavy commands (build, test suites…) unless they run through the project's wrapper, e.g. a memory-limiting script. Does nothing in projects without `.claude/heavy-commands.conf`. Needs `jq`. |
-
-## Why not install all of ECC?
-
-We ran the same three tasks (a feature, a feature with planning and review, a bug fix) on the same small Next.js app with different setups. All of them produced working results.
-
-| Setup | Relative load on usage limits | Time |
-|---|---|---|
-| This repo (5 agents) | 1.0× | ~5 min |
-| This repo + `ecc-router` picking extra ECC agents | ~1.6× | ~10 min |
-| Full ECC install (all agents, skills, hooks) | ~2.4× | ~20 min |
-
-Full ECC wrote slightly more robust code, but at more than twice the cost. Hence: a small default set, and ECC on demand through `ecc-router` when a task needs knowledge the default set lacks. One run per setup on one small app, so treat the numbers as indicative.
 
 ## Known issues
 
