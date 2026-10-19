@@ -35,6 +35,7 @@ skills/      global skills (one folder per skill, SKILL.md inside)
 hooks/       hook scripts, enabled per project via settings.json
 templates/   starting files for a new project (.claude/, CLAUDE.md)
 install.sh   links agents/, skills/ and hooks/ into ~/.claude/
+scripts/     update-third-party-skills.sh (+ .conf, .lock), install-plugins.sh
 UPSTREAM.md            every file copied, adapted or inspired from elsewhere
 THIRD_PARTY_NOTICES.md license texts of those sources
 ```
@@ -43,5 +44,6 @@ THIRD_PARTY_NOTICES.md license texts of those sources
 
 - `skills/ecc-router/catalog.md` is generated. Do not edit it by hand: update the local ECC archive, run `python skills/ecc-router/build-catalog.py`, and update the commit in `UPSTREAM.md`.
 - `ecc-router` is manual only (`disable-model-invocation: true`). It suggests ECC items, waits for the user's confirmation and uses them in the current session only. Keep it that way.
-- Third-party skills or plugins are added only when their license allows it, with their license text in `THIRD_PARTY_NOTICES.md` and an entry in `UPSTREAM.md`.
+- Third-party skills are added only when their license allows it: list them in `scripts/third-party-skills.conf`, run `scripts/update-third-party-skills.sh` (it copies each skill with its LICENSE and writes the lock), and add them to `THIRD_PARTY_NOTICES.md` and the README. Never edit their files by hand, changes would be lost on the next update.
+- Plugins are never copied. Add them to `scripts/install-plugins.sh` and the README instead.
 - The repo is public and marked work in progress. Keep `README.md` (status, agents, skills, known issues) in sync with every change.

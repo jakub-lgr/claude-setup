@@ -20,6 +20,7 @@ agents/      global subagents (Markdown + frontmatter)
 skills/      global skills (one folder per skill, SKILL.md inside)
 hooks/       hook scripts, enabled per project via settings.json
 templates/   starting files for a new project (.claude/, CLAUDE.md)
+scripts/     third-party skill updates and plugin installation
 install.sh   links agents/, skills/ and hooks/ into ~/.claude/
 ```
 
@@ -59,14 +60,20 @@ Rules of thumb:
 - Claude Code
 - bash (Linux, macOS, or Git Bash on Windows) and git
 - `jq` for the heavy command hook
-- Python 3 for rebuilding the `ecc-router` catalog
+- Python 3 for rebuilding the `ecc-router` catalog and for the `ui-ux-pro-max` plugin
+- Node.js (`npm`) for the Codex CLI, only if you use the `codex` plugin
 
 ## Install
 
 ```bash
-git clone <this repo> ~/claude-setup
+git clone https://github.com/jakub-lgr/claude-setup ~/claude-setup
 ~/claude-setup/install.sh
+~/claude-setup/scripts/install-plugins.sh
 ```
+
+`install-plugins.sh` installs the plugins listed under [Plugins](#plugins) and the CLI tools they need. It skips anything already installed. Use `--dry-run` to see what it would do.
+
+**Windows:** run the scripts in Git Bash, which comes with Git for Windows (Claude Code needs it anyway). From PowerShell: `& "C:\Program Files\Git\bin\bash.exe" scripts/install-plugins.sh`.
 
 `install.sh` creates symlinks in `~/.claude/agents`, `~/.claude/skills` and `~/.claude/hooks`. It never overwrites an existing file that is not already a link into this repo. Update everywhere with `git pull`.
 
@@ -84,6 +91,29 @@ Copy what you need from `templates/project/` into the project:
 |---|---|
 | `feature-workflow` | Clarify, plan with `planner`, implement, test, review. |
 | `ecc-router` | Manual only (`/ecc-router <task>`). Keeps [ECC](https://github.com/affaan-m/ecc) as a local archive (`~/ecc` or `$ECC_ARCHIVE`), suggests up to 10 matching agents, skills, commands or rules next to your own agents, waits for your confirmation, and uses the confirmed ones in the current session only. Nothing is installed. Rebuild its catalog after updating the archive: `python skills/ecc-router/build-catalog.py`. |
+
+### Third-party skills
+
+Copied unchanged from their authors' repositories, each with its license in its folder. The exact commits are in `scripts/third-party-skills.lock`. Update them with `scripts/update-third-party-skills.sh` (all, or name the skills to update), then review the diff.
+
+| Source | Skills | License |
+|---|---|---|
+| [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | `high-end-visual-design`, `minimalist-ui`, `industrial-brutalist-ui`, `full-output-enforcement` | MIT |
+| [emilkowalski/skills](https://github.com/emilkowalski/skills) | `animate`, `animate-expo`, `animation-vocabulary`, `apple-design`, `emil-design-eng`, `find-animation-opportunities`, `improve-animations`, `mobile-native`, `review-animations` | MIT |
+| [vercel-labs/skills](https://github.com/vercel-labs/skills) | `find-skills` | MIT |
+| [NVIDIA/skillspector](https://github.com/NVIDIA/skillspector) | `skill-inspector` (full scans need the `skillspector` CLI, installed by `install-plugins.sh`) | Apache-2.0 |
+
+`full-output-enforcement` was removed from taste-skill upstream and is pinned to the last commit that has it.
+
+## Plugins
+
+Plugins are not copied into this repo. `scripts/install-plugins.sh` installs them from their own marketplaces, so they update the usual way.
+
+| Plugin | Source | License | Needs |
+|---|---|---|---|
+| `frontend-design` | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | Apache-2.0 | – |
+| `ui-ux-pro-max` | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | MIT | Python 3 |
+| `codex` | [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) | Apache-2.0 | Codex CLI (installed by the script) and a one-time `codex login` |
 
 ## Hooks
 
@@ -115,12 +145,11 @@ Full ECC wrote slightly more robust code, but at more than twice the cost. Hence
 - [ ] Decide which skills belong here (see `skills/README.md`).
 - [ ] Optional database reviewer agents (MariaDB, PostgreSQL) as project-level or opt-in.
 - [ ] Fix the known issues above.
-- [ ] Document recommended third-party skills and plugins (with their licenses).
 
 ## Credits
 
-Some agents are adapted from or inspired by [ECC](https://github.com/affaan-m/ecc) (MIT), and the `ecc-router` catalog lists ECC's items with their descriptions. See `UPSTREAM.md` and `THIRD_PARTY_NOTICES.md`.
+Some agents are adapted from or inspired by [ECC](https://github.com/affaan-m/ecc) (MIT), and the `ecc-router` catalog lists ECC's items with their descriptions. Third-party skills keep their own licenses. See `UPSTREAM.md` and `THIRD_PARTY_NOTICES.md`.
 
 ## License
 
-MIT, see `LICENSE`.
+MIT for this repo's own files, see `LICENSE`. Third-party skills in `skills/` are under their own licenses, included in each skill's folder.

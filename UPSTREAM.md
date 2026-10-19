@@ -2,6 +2,8 @@
 
 Files in this repo that were copied from, adapted from, or inspired by other projects. License texts are in `THIRD_PARTY_NOTICES.md`.
 
+Third-party skills (copied unchanged, one folder each under `skills/`) are listed with their exact commits in `scripts/third-party-skills.lock`.
+
 Status:
 
 - **copied**: taken as is.
