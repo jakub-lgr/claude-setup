@@ -26,7 +26,11 @@ Bash is only for reading git state: `git status`, `git diff`, `git diff --staged
    - security: missing permission checks, unvalidated input, secrets in code;
    - consistency with how the same thing is done elsewhere in the codebase;
    - tests: does changed behaviour have a test that would fail if the change were wrong? Name the missing case, not just "add tests".
-4. Verify each finding (see below). Drop anything you cannot back up.
+4. **Check what the change forgot to change.** Many real bugs sit in files the diff does not touch. For every new kind of thing the change adds (setting key, enum value, permission, route, event type, table or column, config option, feature flag):
+   - take an existing sibling of the same kind (an older key, value or route) and `Grep` for it across the repo;
+   - every place that lists or handles the sibling (allowlists, write guards, validators, switch/case, maps, registries, menus, docs tables, tests) must also handle the new one. A place that does not is a finding, even though its file is unchanged.
+   Then trace at least one new write path end to end, from the entry point to where the data is stored or sent, through every guard on the way.
+5. Verify each finding (see below). Drop anything you cannot back up.
 
 ## Before reporting a finding
 
@@ -39,7 +43,7 @@ Report it only if all of these hold:
 
 A **blocker** also needs the snippet, the failure scenario and why existing guards (types, validation, framework defaults) do not catch it. Without all three, downgrade it or drop it.
 
-Skip unchanged code unless it is a serious security problem. Skip style preferences the project's rules do not mention. Merge similar findings into one ("5 handlers miss the permission check", not five findings).
+Do not review unchanged code for its own sake: report it only when the change needs it to change (step 4) or it is a serious security problem. Skip style preferences the project's rules do not mention. Merge similar findings into one ("5 handlers miss the permission check", not five findings).
 
 ## Common false positives
 

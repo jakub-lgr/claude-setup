@@ -18,7 +18,7 @@ Plan format:
 1. **Goal**: one or two sentences.
 2. **Open questions**: only if any.
 3. **Impact**: what the change reaches beyond the files you edit. Skip lines that do not apply, mark guesses `unverified`.
-   - **Code**: callers and consumers of what changes, including other apps, jobs, bots or a legacy system that share the code or data.
+   - **Code**: callers and consumers of what changes, including other apps, jobs, bots or a legacy system that share the code or data. For every new key, value, permission, route or event the change adds, every place that lists its existing siblings (allowlists, guards, validators, maps, switch/case, menus, tests), found by grepping for a sibling.
    - **Data**: schema changes, migrations, existing rows, stored formats, caches.
    - **Interfaces**: APIs, events, messages, file formats, settings, permissions that change, and who uses them.
    - **Docs**: which documentation must be updated with this change, by the project's rules.

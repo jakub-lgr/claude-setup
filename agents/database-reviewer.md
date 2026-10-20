@@ -99,5 +99,5 @@ Report it only if all of these hold:
 - Engine and version you assumed, and where you got it from.
 - `file:line` · severity (critical / high / medium) · problem · failure scenario · what to change.
 - Critical first. Group repeated problems ("4 queries miss the tenant filter").
-- Commands the user should run to confirm a finding (`EXPLAIN`, dry run, row counts), if any.
+- Commands the user should run to confirm a finding (`EXPLAIN`, `SHOW CREATE TABLE`, row counts, a migration dry run), if any. Suggest read-only commands only; never suggest running an exploit or a write against a real database.
 - If nothing survived verification, answer "No findings."
