@@ -28,8 +28,10 @@ install.sh   links agents/, skills/ and hooks/ into ~/.claude/
 
 | Agent | Model | Effort | Use it for |
 |---|---|---|---|
+| `database-reviewer` | sonnet | high | Migrations, schema changes and queries, any database engine (MySQL/MariaDB, PostgreSQL, SQLite…), against the project's own rules. Read-only. |
+| `docs-sync` | haiku | medium | After a change: updates the docs the project's rules say must change with it. Edits Markdown only. |
 | `explainer` | sonnet | medium | How does this flow work end to end? Traces code through layers. |
-| `planner` | opus | high | Plan a feature or refactor before writing code. Read-only. |
+| `planner` | opus | high | Plan a feature or refactor before writing code, including its impact (consumers, data, docs, release and rollback). Read-only. |
 | `reviewer` | sonnet | high | Review the current diff against the project's own rules. Read-only. |
 | `security-reviewer` | sonnet | high | Access control, injection, secrets, unsafe input in changed code. Read-only. |
 | `silent-failure-hunter` | sonnet | medium | Swallowed errors, bad fallbacks, unknown treated as known. |
@@ -46,8 +48,12 @@ Ask for them explicitly, it is more reliable than waiting for automatic use:
 2. **`planner`** (Opus) writes the plan. Read it, adjust it.
 3. Main session implements the plan.
 4. Tests, using the project's own commands.
-5. **`reviewer`** checks the diff. Add **`security-reviewer`** for auth, permissions or user input, and **`silent-failure-hunter`** for error-heavy code.
-6. Fix findings, commit.
+5. Compare the diff with the plan's impact section.
+6. **`reviewer`** checks the diff. Add **`security-reviewer`** for auth, permissions or user input, **`silent-failure-hunter`** for error-heavy code, and **`database-reviewer`** for migrations and queries.
+7. Fix findings, then **`docs-sync`** updates the docs.
+8. Commit with a message from the `commit-message` skill.
+
+The `feature-workflow` skill runs these steps for you.
 
 Rules of thumb:
 
@@ -59,7 +65,7 @@ Rules of thumb:
 
 - Claude Code
 - bash (Linux, macOS, or Git Bash on Windows) and git
-- `jq` for the heavy command hook
+- `jq` for the hooks (without it, `readonly-git.sh` blocks every Bash call of the read-only agents and `guard-heavy-commands.sh` blocks heavy-looking commands)
 - Python 3 for rebuilding the `ecc-router` catalog and for the `ui-ux-pro-max` plugin
 - Node.js (`npm`) for the Codex CLI, only if you use the `codex` plugin
 
@@ -91,7 +97,9 @@ Copy what you need from `templates/project/` into the project:
 
 | Skill | What it does |
 |---|---|
-| `feature-workflow` | Clarify, plan with `planner`, implement, test, review. |
+| `feature-workflow` | Clarify, plan with `planner`, implement, test, check the diff against the plan, review, update docs with `docs-sync`. |
+| `commit-message` | Draft a commit message in the repo's own style, learned from `git log`. Suggests splitting mixed diffs. |
+| `pre-publish-check` | Before making a repo public: scan files and git history for secrets, personal data, internal hosts, domains and local paths. Read-only report. |
 | `ecc-router` | Manual only (`/ecc-router <task>`). Keeps [ECC](https://github.com/affaan-m/ecc) as a local archive (`~/ecc` or `$ECC_ARCHIVE`), suggests up to 10 matching agents, skills, commands or rules next to your own agents, waits for your confirmation, and uses the confirmed ones in the current session only. Nothing is installed. Rebuild its catalog after updating the archive: `python skills/ecc-router/build-catalog.py`. |
 
 ### Third-party skills
@@ -119,20 +127,20 @@ Plugins are not copied into this repo. `scripts/install-plugins.sh` installs the
 
 | Hook | What it does |
 |---|---|
-| `guard-heavy-commands.sh` | Blocks heavy commands (build, test suites…) unless they run through the project's wrapper, e.g. a memory-limiting script. Does nothing in projects without `.claude/heavy-commands.conf`. Needs `jq`. |
+| `guard-heavy-commands.sh` | Blocks heavy commands (build, test suites…) unless they run through the project's wrapper, e.g. a memory-limiting script. Each part of a chained command must start with the wrapper itself. Does nothing in projects without `.claude/heavy-commands.conf`. Needs `jq`. |
+| `readonly-git.sh` | Used by the read-only agents through their frontmatter, nothing to enable. Allows only `git status`, `git diff` and `git log` in Bash, blocks everything else. |
 
 ## Known issues
 
 - `install.sh` on Windows: Git Bash's `ln -s` copies files instead of linking them unless symlinks are enabled (Developer Mode and `MSYS=winsymlinks:nativestrict`). Copies are not updated by `git pull`.
-- `guard-heavy-commands.sh` does nothing if `jq` is missing, without a warning. Its wrapper check can be bypassed by a command that mentions the wrapper later on the line.
-- Review agents limit Bash to read-only git commands by instruction only, it is not enforced yet.
+- `readonly-git.sh` is found through `~/.claude/hooks/`. If `install.sh` has not been run, the hook is missing and the read-only agents fall back to the instruction alone.
+- `guard-heavy-commands.sh` splits chained commands on `;`, `&&`, `|` and similar without understanding quotes, so a separator inside a quoted string can split a command in the wrong place. It errs on the side of blocking.
 
 ## TODO
 
-- [ ] Tune agent prompts on real tasks.
-- [ ] Decide which skills belong here (see `skills/README.md`).
-- [ ] Optional database reviewer agents (MariaDB, PostgreSQL) as project-level or opt-in.
-- [ ] Fix the known issues above.
+- [ ] Keep tuning agent prompts on real tasks. First round done (all new agents, reviewer, silent-failure-hunter); `docs-sync` stays on haiku.
+- [ ] `release-checklist` and `new-project` skills (see `skills/README.md`).
+- [ ] Later: project-level parity reviewer template (compare a ported page with its legacy original).
 
 ## Credits
 
