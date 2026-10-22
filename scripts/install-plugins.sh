@@ -7,20 +7,27 @@
 #   codex            (OpenAI)               plugin, needs the Codex CLI and a login
 #   skillspector     (NVIDIA)               CLI for the skill-inspector skill
 #
+# Optional, not for coding, only with --personal:
+#
+#   trader-skill     (Jake Schincariol)     plugin, investing; needs Python 3
+#   founder-skill    (Jake Schincariol)     plugin, testing a business idea; needs Python 3
+#
 # Safe to rerun: anything already installed is left as it is.
 # Works in bash on Linux, macOS and Git Bash on Windows.
 #
 #   scripts/install-plugins.sh             install everything
 #   scripts/install-plugins.sh --dry-run   only print what would run
 #   --skip-codex, --skip-skillspector      leave those parts out
+#   --personal                             also install the optional plugins
 set -uo pipefail
 
-dry=0 codex=1 spector=1
+dry=0 codex=1 spector=1 personal=0
 for arg in "$@"; do
   case "$arg" in
     --dry-run) dry=1 ;;
     --skip-codex) codex=0 ;;
     --skip-skillspector) spector=0 ;;
+    --personal) personal=1 ;;
     *) echo "unknown option: $arg" >&2; exit 2 ;;
   esac
 done
@@ -69,6 +76,16 @@ if [[ $codex == 1 ]]; then
     echo "note   install Node.js, then run: npm install -g @openai/codex" >&2
   fi
   echo "note   if you have not logged in to Codex yet, run once: codex login"
+fi
+
+# --- Optional plugins, not for coding (--personal) ------------------------------
+if [[ $personal == 1 ]]; then
+  add_marketplace trader-skill Jakeschincariol/trader-skill
+  install_plugin trader-skill@trader-skill
+  add_marketplace founder-skill Jakeschincariol/founder-skill
+  install_plugin founder-skill@founder-skill
+  has python3 || has python || echo "note   trader-skill and founder-skill need Python 3 for their scripts."
+  echo "note   turn them off in coding projects with /plugin so their skills stay out of those sessions."
 fi
 
 # --- skillspector CLI for the skill-inspector skill ----------------------------

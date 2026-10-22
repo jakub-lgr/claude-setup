@@ -123,6 +123,13 @@ Plugins are not copied into this repo. `scripts/install-plugins.sh` installs the
 | `ui-ux-pro-max` | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | MIT | Python 3 |
 | `codex` | [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) | Apache-2.0 | Codex CLI (installed by the script) and a one-time `codex login` |
 
+Optional plugins, not for coding. Installed only with `scripts/install-plugins.sh --personal`. Each adds 11 skills that can trigger on their own, so turn them off with `/plugin` in coding projects.
+
+| Plugin | Source | License | What it is for | Needs |
+|---|---|---|---|---|
+| `trader-skill` | [Jakeschincariol/trader-skill](https://github.com/Jakeschincariol/trader-skill) | MIT | Investing: copy a portfolio from 13F filings, news and Congress trade alerts, budget and risk checks, taxes, rebalancing. Orders only after an explicit yes, paper trading by default. | Python 3 |
+| `founder-skill` | [Jakeschincariol/founder-skill](https://github.com/Jakeschincariol/founder-skill) | MIT | Testing a business idea: board review, competitors, simulated buyer panel, pricing, unit economics, launch plan. Simulated buyers are a brainstorm, not market research. | Python 3 |
+
 ## Hooks
 
 | Hook | What it does |
