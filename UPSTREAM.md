@@ -12,7 +12,7 @@ Status:
 
 ## ECC
 
-Source: https://github.com/affaan-m/ecc. Each row names the commit it was taken from: `76aaa77` = `76aaa77df6adc5b889e689007bf99b9a4f74af34`, `6f1881a` = `6f1881aeafa3c48f7b603cc4be4b2e4e70daad59`.
+Source: https://github.com/affaan-m/ecc. Each row names the commit it was taken from: `76aaa77` = `76aaa77df6adc5b889e689007bf99b9a4f74af34`, `6f1881a` = `6f1881aeafa3c48f7b603cc4be4b2e4e70daad59`, `90606c8` = `90606c8315ee09cafc303515c5f33024db6b9882`.
 
 | File here | ECC source | Commit | Status | Notes |
 |---|---|---|---|---|
@@ -27,6 +27,7 @@ Source: https://github.com/affaan-m/ecc. Each row names the commit it was taken 
 | `agents/database-reviewer.md` | `skills/database-migrations/SKILL.md`, `skills/mysql-patterns/SKILL.md` | `6f1881a` | idea | Expand-contract changes, batched backfills, online DDL, immutable applied migrations. |
 | `agents/docs-sync.md` | `agents/doc-updater.md`, `skills/living-docs-governance/SKILL.md` | `6f1881a` | idea | Docs follow the code, haiku model, adopt the project's existing doc structure. |
 | `agents/planner.md` | `skills/change-impact/SKILL.md` | `6f1881a` | idea | Impact section (code, data, interfaces, docs, release), unknowns marked "unverified", no rollback = not finished. |
-| `skills/feature-workflow/SKILL.md` | `skills/change-impact/SKILL.md` | `6f1881a` | idea | Compare the diff with the planned impact after implementation. |
+| `skills/dev/SKILL.md` | `skills/change-impact/SKILL.md` | `6f1881a` | idea | Compare the diff with the planned impact after implementation. |
+| `skills/dev/SKILL.md` | `skills/orch-pipeline/SKILL.md`, `skills/orch-add-feature/SKILL.md`, `skills/orch-change-feature/SKILL.md`, `skills/orch-fix-defect/SKILL.md`, `skills/orch-refine-code/SKILL.md`, `skills/ecc-recipes/SKILL.md` | `90606c8` | idea | One entry point that picks the workflow, size classifier that scales the steps, a first move per task type, plan and commit gates. |
 | `skills/commit-message/SKILL.md` | `agents/commit-reviewer.md` | `6f1881a` | idea | Learn the message style from `git log`, suggest splitting mixed diffs. |
 | `skills/pre-publish-check/SKILL.md` | `agents/opensource-sanitizer.md` | `6f1881a` | idea | Secret, personal data, internal reference and dangerous file scans, git history audit, PASS/FAIL report. |

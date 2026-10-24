@@ -42,18 +42,24 @@ Ask for them explicitly, it is more reliable than waiting for automatic use:
 
 > Run the `planner` agent: add CSV export to the orders page.
 
-## Recommended workflow for a feature
+## Recommended workflow
+
+Describe the task to `/dev` and it picks the workflow for you:
+
+> /dev add CSV export to the orders page
+
+It classifies the task as a new feature, a change, a fix or a refactor, estimates its size (trivial, small, standard, large), tells you in one line, then runs the matching steps with two gates where it waits for you: plan approval and commit approval. Small tasks skip the planner and the docs step. Its report lists every agent it ran or skipped, so a skipped `planner` or reviewer is visible.
+
+The steps for a standard feature:
 
 1. Main session on **Sonnet**. Clarify the task with it first.
-2. **`planner`** (Opus) writes the plan. Read it, adjust it.
-3. Main session implements the plan.
+2. **`planner`** (Opus) writes the plan. Read it, adjust it, approve it (gate 1).
+3. Main session writes the tests first, then implements the plan. A fix starts with a test that reproduces the bug, a refactor keeps the existing tests passing unchanged.
 4. Tests, using the project's own commands.
 5. Compare the diff with the plan's impact section.
 6. **`reviewer`** checks the diff. Add **`security-reviewer`** for auth, permissions or user input, **`silent-failure-hunter`** for error-heavy code, and **`database-reviewer`** for migrations and queries.
 7. Fix findings, then **`docs-sync`** updates the docs.
-8. Commit with a message from the `commit-message` skill.
-
-The `feature-workflow` skill runs these steps for you.
+8. Approve the commit (gate 2): only this task's files, with a message from the `commit-message` skill. No push unless you say so.
 
 Rules of thumb:
 
@@ -97,7 +103,7 @@ Copy what you need from `templates/project/` into the project:
 
 | Skill | What it does |
 |---|---|
-| `feature-workflow` | Clarify, plan with `planner`, implement, test, check the diff against the plan, review, update docs with `docs-sync`. |
+| `dev` | Manual only (`/dev <task>`). One entry point for development work: classifies the task (feature, change, fix, refactor) and its size, then runs the matching workflow: clarify, plan with `planner`, gate 1, tests first, implement, check against the plan, review with the agents that apply, `docs-sync`, report with the agents that ran or were skipped, gate 2 (commit only this task's files, never push without asking). |
 | `commit-message` | Draft a commit message in the repo's own style, learned from `git log`. Suggests splitting mixed diffs. |
 | `pre-publish-check` | Before making a repo public: scan files and git history for secrets, personal data, internal hosts, domains and local paths. Read-only report. |
 | `ecc-router` | Manual only (`/ecc-router <task>`). Keeps [ECC](https://github.com/affaan-m/ecc) as a local archive (`~/ecc` or `$ECC_ARCHIVE`), suggests up to 10 matching agents, skills, commands or rules next to your own agents, waits for your confirmation, and uses the confirmed ones in the current session only. Nothing is installed. Rebuild its catalog after updating the archive: `python skills/ecc-router/build-catalog.py`. |
