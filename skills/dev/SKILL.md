@@ -13,6 +13,8 @@ The user describes what they want. You pick the workflow, so they do not need to
 
 Take the task from the arguments, or from the user's last message if there are none. Read the project's `CLAUDE.md` / `AGENTS.md` first; their rules win over this file wherever they differ (test commands, wrappers for heavy commands, commit rules).
 
+Write every message to the user, including the plan and the report, in the language the user wrote the task in.
+
 ## 1. Classify
 
 Decide the **type**:
@@ -35,7 +37,7 @@ Decide the **size**. Take the highest size any signal reaches:
 
 Anything touching authentication, permissions, user input, money, a migration or a public interface is at least `standard`.
 
-Tell the user the result in one line, with one reason, and continue unless they correct you:
+Tell the user the result in one line, with one reason, and continue unless they correct you. This line is the first thing you write, for every size including `trivial`, before running any agent, asking questions or showing a plan:
 
 > Type: fix, size: small (one function in the export service). Correct me if not.
 
@@ -102,7 +104,7 @@ Run the `docs-sync` agent with a one-paragraph summary of the change and its ver
 
 Report:
 
-1. **Result**: what changed and why, in a few lines.
+1. **Result**: the type and size from step 1, then what changed and why, in a few lines.
 2. **Agents**: a table of every agent this workflow called for (`planner`, `reviewer`, the conditional reviewers, `docs-sync`), each marked `ran` or `skipped`, with the reason for each skip. An agent the workflow required that did not run is a defect of this run: say so plainly.
 3. **Verified**: tests and checks run, with results. **Not verified**: what was not run (build, browser, live services) and why.
 4. **Open decisions**: findings or questions left for the user.
