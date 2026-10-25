@@ -35,9 +35,9 @@ Decide the **size**. Take the highest size any signal reaches:
 | `standard` | 2 to 5 | maybe an internal module | one real choice |
 | `large` | many, cross-cutting | yes | several |
 
-Anything touching authentication, permissions, user input, money, a migration or a public interface is at least `standard`.
+Anything touching authentication, permissions, user input, money or a public interface is at least `standard`. A schema change, a migration or a new permission is always `large`.
 
-Tell the user the result in one line, with one reason, and continue unless they correct you. This line is the first thing you write, for every size including `trivial`, before running any agent, asking questions or showing a plan:
+Tell the user the result in one line, with one reason, and continue unless they correct you. This line is the first thing you write, for every size including `trivial`, before running any agent, asking questions or showing a plan. Write all of it, the labels included, in the user's language. The example shows the content, not the wording:
 
 > Type: fix, size: small (one function in the export service). Correct me if not.
 
@@ -52,7 +52,7 @@ Restate the task in two or three sentences. Ask about anything that changes the 
 | Size | Plan |
 |---|---|
 | `trivial`, `small` | No `planner`. State the intended change and the test in a few lines. |
-| `standard`, `large` | Run the `planner` agent. Do not write the plan yourself. |
+| `standard`, `large` | Run the `planner` agent in the foreground and wait for its plan. Do not run it in the background and do not write the plan yourself. |
 
 Give `planner` the full task, the answers from step 2, the type and what it should stress:
 
@@ -67,6 +67,8 @@ Show the plan. **Gate 1: wait for the user's approval.** Do not change any file 
 
 Follow the approved plan. If reality differs from it, stop and tell the user before deviating.
 
+Before the first change, run the project's checks once (tests, and typecheck or lint if the project has them; a relevant subset is enough in a large project) and note what already fails. Those failures are not this task's. Never stash, reset, check out or otherwise move uncommitted work that is not yours to get a clean baseline; if you need one later, use a separate `git worktree` of `HEAD` and remove it afterwards.
+
 The first move depends on the type:
 
 - `feature`: write new tests for the new behaviour, see them fail, then implement until they pass.
@@ -76,7 +78,7 @@ The first move depends on the type:
 
 Run tests with the project's own commands. If the project has no tests for this area, say so instead of skipping silently.
 
-Where tests or checks fail for reasons outside this task (other uncommitted work, a broken base), say so and keep them apart from this task's failures.
+Where tests or checks fail for reasons outside this task (failures from the baseline, other uncommitted work, a broken base), say so and keep them apart from this task's failures.
 
 ## 5. Check against the plan
 
@@ -91,7 +93,7 @@ For `standard` and `large`, compare the diff with the plan's **Impact** and **Do
 Run the `reviewer` agent on the diff, for every size except `trivial`. Add, when they apply:
 
 - `security-reviewer`: authentication, permissions, user input, secrets, sensitive data, calls to external services;
-- `silent-failure-hunter`: error handling, external calls, background jobs, retries;
+- `silent-failure-hunter`: error handling, external calls, background jobs, retries. Outbox or queue events, webhooks and scheduled tasks count as background jobs;
 - `database-reviewer`: migrations, schema changes, new or changed queries.
 
 Run only the ones that apply. Fix verified findings and rerun the tests. Findings that need the user's decision go into the report, not into the code.
