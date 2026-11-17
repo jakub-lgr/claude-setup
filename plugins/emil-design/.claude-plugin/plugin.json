@@ -1,0 +1,17 @@
+{
+  "name": "emil-design",
+  "version": "2.0.0",
+  "description": "Emil Kowalski's design engineering skills for web and React Native: UI polish, Apple-style interaction, animation building, review and performance, gestures, prototyping and UI stress tests.",
+  "author": {
+    "name": "jakub-lgr"
+  },
+  "license": "MIT",
+  "keywords": [
+    "design",
+    "ui",
+    "animation",
+    "motion",
+    "react",
+    "expo"
+  ]
+}

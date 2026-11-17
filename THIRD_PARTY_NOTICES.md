@@ -4,14 +4,15 @@ Parts of this repository are copied or adapted from the projects below. Each cop
 
 ## Third-party skills
 
-These skills are copied unchanged into `skills/`. Each skill's folder contains the `LICENSE` (and `NOTICE`, if any) of the repository it comes from, and that license applies to the folder. Exact commits: `scripts/third-party-skills.lock`.
+These skills are copied unchanged into `plugins/<plugin>/skills/`. Each skill's folder contains the `LICENSE` (and `NOTICE`, if any) of the repository it comes from, and that license applies to the folder. Exact commits: `scripts/third-party-skills.lock`.
 
-| Skills | Source | License | Copyright |
-|---|---|---|---|
-| high-end-visual-design, minimalist-ui, industrial-brutalist-ui, full-output-enforcement | https://github.com/Leonxlnx/taste-skill | MIT | Copyright (c) 2026 Leonxlnx |
-| animate, animate-expo, animation-vocabulary, apple-design, emil-design-eng, find-animation-opportunities, improve-animations, mobile-native, review-animations | https://github.com/emilkowalski/skills | MIT | Copyright (c) 2026 Emil Kowalski |
-| find-skills | https://github.com/vercel-labs/skills | MIT | Copyright (c) 2026 Vercel, Inc. |
-| skill-inspector | https://github.com/NVIDIA/skillspector | Apache-2.0 | NVIDIA |
+| Skills | Plugin | Source | License | Copyright |
+|---|---|---|---|---|
+| emil-design-eng, apple-design, mobile-native, learn-taste, pick-ui-library, prototype, break-ui, animate, animate-expo, animation-vocabulary, animation-performance, choreograph, gestures, review-animations, improve-animations, find-animation-opportunities, remove-animations, ask-emil, ask-sonner | emil-design | https://github.com/emilkowalski/skills | MIT | Copyright (c) 2026 Emil Kowalski |
+| write-swift | ios | https://github.com/emilkowalski/skills | MIT | Copyright (c) 2026 Emil Kowalski |
+| skill-inspector | core | https://github.com/NVIDIA/skillspector | Apache-2.0 | NVIDIA |
+
+Plugins listed in the marketplace with an external source (`ui-ux-pro-max`) are not copied into this repository; they are installed from their own repositories under their own licenses.
 
 ## ECC
 

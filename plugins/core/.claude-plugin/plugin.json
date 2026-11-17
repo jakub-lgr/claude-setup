@@ -1,0 +1,15 @@
+{
+  "name": "core",
+  "version": "2.0.0",
+  "description": "Small base for every project: commit messages in the repo's own style, a pre-publish scan for secrets and personal data, and a security check for skills before installing them.",
+  "author": {
+    "name": "jakub-lgr"
+  },
+  "license": "MIT",
+  "keywords": [
+    "git",
+    "commit",
+    "security",
+    "skills"
+  ]
+}

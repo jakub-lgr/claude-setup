@@ -1,0 +1,15 @@
+{
+  "name": "ios",
+  "version": "2.0.0",
+  "description": "Skills for native Apple apps: modern Swift (Swift 6 concurrency, value types, Swift Testing, macros).",
+  "author": {
+    "name": "jakub-lgr"
+  },
+  "license": "MIT",
+  "keywords": [
+    "swift",
+    "ios",
+    "macos",
+    "xcode"
+  ]
+}

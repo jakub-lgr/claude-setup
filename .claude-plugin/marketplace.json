@@ -1,0 +1,39 @@
+{
+  "name": "claude-setup",
+  "owner": {
+    "name": "jakub-lgr"
+  },
+  "metadata": {
+    "description": "Skill bundles to switch on per project: a small core for everywhere, plus design, iOS and UI/UX bundles only where they are needed.",
+    "version": "2.0.0"
+  },
+  "plugins": [
+    {
+      "name": "core",
+      "source": "./plugins/core",
+      "description": "Base for every project: commit-message, pre-publish-check, skill-inspector.",
+      "category": "productivity"
+    },
+    {
+      "name": "emil-design",
+      "source": "./plugins/emil-design",
+      "description": "Emil Kowalski's design and animation skills for web and React Native (19 skills).",
+      "category": "design"
+    },
+    {
+      "name": "ios",
+      "source": "./plugins/ios",
+      "description": "Native Apple apps: write-swift.",
+      "category": "development"
+    },
+    {
+      "name": "ui-ux-pro-max",
+      "source": {
+        "source": "github",
+        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
+      },
+      "description": "UI/UX design intelligence from nextlevelbuilder: 80 styles, 192 palettes, 74 font pairings, 22 stacks. Installed straight from its own repository, not copied here. Needs Python 3.",
+      "category": "design"
+    }
+  ]
+}

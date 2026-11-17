@@ -1,164 +1,181 @@
 # claude-setup
 
-My personal Claude Code setup: my own agents, skills and hooks, plus selected public skills and plugins under open licenses. Everything is generic and works in any project.
+My personal Claude Code setup as a **plugin marketplace**: skill bundles that I switch on per project instead of loading everything into every session. A web project gets the design bundles, an iOS app gets the Swift bundle, a video project gets its own tools, and only a small core is on everywhere.
 
-> **Status: work in progress (WIP).** Usable, but agents and skills are still being tuned on real tasks. Expect changes. See [Known issues](#known-issues).
+> **Version 2.0.** Version 1 (global agents, hooks and an `install.sh` that linked everything into `~/.claude/`) lives on the `main` branch history. v2 drops custom agents: current models work well on their own when given good playbooks, so this repo now ships skills only.
 
 ## Idea
 
-- **Agents are generic, rules live in the project.** Every agent starts by reading the project's own `CLAUDE.md` / `AGENTS.md` and follows it. The same `reviewer` checks one project's conventions here and a different project's conventions there.
-- **Two layers.**
-  - **Global** (this repo, linked into `~/.claude/`): the same on every machine.
-  - **Project** (`.claude/` inside each project repo): project rules, project-only agents, hook config. A project agent with the same name overrides the global one.
-- **Cheap models for cheap work, expensive models only where judgment matters.** Opus plans, Sonnet implements and reviews, Haiku searches.
-- **Few agents, used on purpose.** Each agent description is loaded into every session, so every extra agent costs context.
+- **Bundles, not one big global install.** Every plugin is a bundle of skills for one kind of work. A disabled plugin is not loaded at all, so its skills cannot trigger by mistake in the wrong project.
+- **Off globally, on per project.** Install the plugins once per machine, keep everything except `core` disabled in `~/.claude/settings.json`, and enable the bundles a project needs in that project's `.claude/settings.json`. Project settings win over user settings.
+- **One copy of every skill.** Skills live here, not copied into each project, so an update reaches every project at once.
+- **Third-party work is reused only under its license.** Skills from other authors are copied unchanged with their `LICENSE`; plugins that have their own repository are referenced, not copied.
+
+## Catalog
+
+### `core` – on everywhere (3 skills)
+
+| Skill | What it does | Source |
+|---|---|---|
+| `commit-message` | Drafts a commit message in the repository's own style, learned from `git log`. Suggests splitting mixed diffs. | own |
+| `pre-publish-check` | Before a repo goes public: scans files and git history for secrets, personal data, internal hosts, domains and local paths. Read-only PASS / WARN / FAIL report. | own |
+| `skill-inspector` | Checks a skill before you install it: over-permissioned, exfiltrating or malicious instructions and scripts. Full scans need the `skillspector` CLI (`scripts/install-skillspector.sh`). | [NVIDIA/skillspector](https://github.com/NVIDIA/skillspector), Apache-2.0 |
+
+### `emil-design` – web and React Native projects (19 skills)
+
+All from [emilkowalski/skills](https://github.com/emilkowalski/skills) (MIT).
+
+| Skill | What it does |
+|---|---|
+| **Design** | |
+| `emil-design-eng` | UI polish, component design and the invisible details that make software feel great. |
+| `apple-design` | Apple's approach to interface design and fluid, physical motion, translated for the web. |
+| `mobile-native` | Small CSS and meta-tag fixes that make a web app feel native on a phone. |
+| `learn-taste` | Turns a session's design corrections into rules in `DESIGN.md`, a project skill or a lint check. |
+| `pick-ui-library` | Picks a library for a frontend task from a curated list (primitives, toasts, drawers, charts, drag and drop…). |
+| `prototype` | Builds several genuinely different versions of a UI piece behind a live picker. |
+| `break-ui` | Feeds UI worst-case data (long names, empty lists, huge numbers, emoji…) and reports what broke. |
+| **Animation** | |
+| `animate` | Builds an animation from scratch: should it animate, which properties, curve, duration, interruption, exit. |
+| `animate-expo` | The same for React Native and Expo (Reanimated, Gesture Handler, haptics). |
+| `animation-vocabulary` | "What is it called when…": turns a vague description of a motion effect into its exact name. |
+| `animation-performance` | Keeps animations inside the frame budget and finds why one drops frames. |
+| `choreograph` | Coordinates several elements that animate together (staggers, hero entrances, view swaps). |
+| `gestures` | Drag, swipe and sheet interactions that track the finger 1:1 and stay interruptible. |
+| `review-animations` | Strict review of animation code against a high craft bar. |
+| `improve-animations` | Audits a whole codebase's motion and writes a prioritized plan. Read-only. |
+| `find-animation-opportunities` | Finds places that should animate and rejects those that should not. Read-only. |
+| `remove-animations` | Removes motion the interface does not need. Only subtracts. |
+| **Helpers** | |
+| `ask-emil` | Router: tells you which of these skills fits your situation. |
+| `ask-sonner` | Guide to Sonner, the React toast library. Triggers only when you work with Sonner. |
+
+### `ui-ux-pro-max` – web projects (7 skills)
+
+From [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) (MIT). Listed in this marketplace, but installed straight from its own repository, not copied here. Needs **Python 3** for its search scripts.
+
+| Skill | What it does |
+|---|---|
+| `ui-ux-pro-max` | Design intelligence with a searchable local database: 80 styles, 192 palettes, 74 font pairings, 25 chart types, 22 stacks. |
+| `ui-styling` | shadcn/ui + Tailwind interfaces. |
+| `design-system` | Design tokens (primitive → semantic → component) and component specs. |
+| `design` | Brand identity, logos, icons, corporate identity. Parts call external image AI services. |
+| `brand` | Brand voice, visual identity, style guides. |
+| `banner-design` | Banners for social media, ads, website heroes and print. |
+| `slides` | HTML presentations with Chart.js. |
+
+### `ios` – Swift / Xcode projects (1 skill)
+
+| Skill | What it does | Source |
+|---|---|---|
+| `write-swift` | Modern Swift: value types, Swift 6 concurrency, protocols and generics, API design, Swift Testing, macros. | [emilkowalski/skills](https://github.com/emilkowalski/skills), MIT |
+
+Tip: in an iOS project enable `emil-design` too if you want `apple-design` and `gestures`.
+
+### Video – Tesseract (not in this repo)
+
+[Tesseract by Mirage](https://mirage.app/tesseract) ([mirage-hq/Tesseract](https://github.com/mirage-hq/Tesseract)) is a local video editor, motion graphics and 3D renderer driven by the agent. It is **not part of this marketplace**: it ships under Mirage's own terms, not an open-source license, and needs a downloaded CLI. Install it **per video project**.
+
+Its skills: `tesseract-video` (edit footage into a finished video), `tesseract-motion` (motion graphics, titles, overlays), `tesseract-design` (static designs as PNG), `tesseract-3d` (3D scenes), `tesseract-editor` (custom browser editor for `.tsrct` files).
+
+Install, inside the video project, by pasting this into a new Claude Code session there:
+
+```text
+Set up Tesseract by Mirage so you can create editable designs and 3D scenes, edit videos,
+and make motion graphics in this agent's environment. Read https://github.com/mirage-hq/Tesseract
+and check the requirements for this local or hosted environment. If it is supported, follow the
+official plugin or skills installation guide, use its required runtime version, verify the
+download checksum, and confirm a short preview renders correctly. Then ask what I want to make
+and which brand references or source assets I have. Keep the editable project and source assets
+with the finished render.
+```
+
+Or from a terminal (needs Node.js): `npx skills add mirage-hq/Tesseract`. The skills do not update themselves; run the same again for a new version. Project-specific video playbooks (for example a cutting style for one channel) belong in that project's own `.claude/skills/`.
+
+## Install
+
+Once per machine, in Claude Code:
+
+```text
+/plugin marketplace add jakub-lgr/claude-setup
+/plugin install core@claude-setup
+/plugin install emil-design@claude-setup
+/plugin install ui-ux-pro-max@claude-setup
+/plugin install ios@claude-setup
+```
+
+Or from a terminal:
+
+```bash
+claude plugin marketplace add jakub-lgr/claude-setup
+claude plugin install core@claude-setup
+claude plugin install emil-design@claude-setup
+claude plugin install ui-ux-pro-max@claude-setup
+claude plugin install ios@claude-setup
+```
+
+Then switch the bundles **off globally**, so only `core` is on everywhere:
+
+```bash
+claude plugin disable emil-design@claude-setup --scope user
+claude plugin disable ui-ux-pro-max@claude-setup --scope user
+claude plugin disable ios@claude-setup --scope user
+```
+
+Optional, for full `skill-inspector` scans: `scripts/install-skillspector.sh` (Git Bash on Windows).
+
+Update everything later with `/plugin marketplace update claude-setup`.
+
+## Per project
+
+Enable the bundles a project needs, from inside the project folder:
+
+```bash
+claude plugin enable emil-design@claude-setup --scope project
+```
+
+This writes `.claude/settings.json` in the project. Commit it, and on another machine Claude Code offers to install whatever the project needs. Typical setups:
+
+| Project | `.claude/settings.json` |
+|---|---|
+| Website / web app | `emil-design`, `ui-ux-pro-max` |
+| React Native / Expo app | `emil-design` |
+| iOS app in Xcode | `ios` (+ `emil-design` for `apple-design`, `gestures`) |
+| Discord bot, server, API | nothing extra, `core` is enough |
+| Video | Tesseract installed in the project (see above) |
+
+Example for a website:
+
+```json
+{
+  "enabledPlugins": {
+    "emil-design@claude-setup": true,
+    "ui-ux-pro-max@claude-setup": true
+  }
+}
+```
 
 ## Layout
 
 ```
-agents/      global subagents (Markdown + frontmatter)
-skills/      global skills (one folder per skill, SKILL.md inside)
-hooks/       hook scripts, enabled per project via settings.json
-templates/   starting files for a new project (.claude/, CLAUDE.md)
-scripts/     third-party skill updates and plugin installation
-install.sh   links agents/, skills/ and hooks/ into ~/.claude/
+.claude-plugin/marketplace.json   the marketplace: lists every plugin
+plugins/<plugin>/                 one bundle per folder
+  .claude-plugin/plugin.json
+  skills/<skill>/SKILL.md
+scripts/
+  update-third-party-skills.sh    copies third-party skills into their plugin (+ .conf, .lock)
+  install-skillspector.sh         CLI for full skill-inspector scans
+UPSTREAM.md                       everything taken or inspired from elsewhere
+THIRD_PARTY_NOTICES.md            licenses of those sources
 ```
 
-## Agents
+## Maintaining
 
-| Agent | Model | Effort | Use it for |
-|---|---|---|---|
-| `database-reviewer` | sonnet | high | Migrations, schema changes and queries, any database engine (MySQL/MariaDB, PostgreSQL, SQLite…), against the project's own rules. Read-only. |
-| `docs-sync` | haiku | medium | After a change: updates the docs the project's rules say must change with it. Edits Markdown only. |
-| `explainer` | sonnet | medium | How does this flow work end to end? Traces code through layers. |
-| `planner` | opus | high | Plan a feature or refactor before writing code, including its impact (consumers, data, docs, release and rollback). Read-only. |
-| `reviewer` | sonnet | high | Review the current diff against the project's own rules. Read-only. |
-| `security-reviewer` | sonnet | high | Access control, injection, secrets, unsafe input in changed code. Read-only. |
-| `silent-failure-hunter` | sonnet | medium | Swallowed errors, bad fallbacks, unknown treated as known. |
-
-For plain code search use Claude Code's built-in `Explore` agent.
-
-Ask for them explicitly, it is more reliable than waiting for automatic use:
-
-> Run the `planner` agent: add CSV export to the orders page.
-
-## Recommended workflow
-
-Describe the task to `/dev` and it picks the workflow for you:
-
-> /dev add CSV export to the orders page
-
-It classifies the task as a new feature, a change, a fix or a refactor, estimates its size (trivial, small, standard, large), tells you in one line, then runs the matching steps with two gates where it waits for you: plan approval and commit approval. Small tasks skip the planner and the docs step. Its report lists every agent it ran or skipped, so a skipped `planner` or reviewer is visible.
-
-The steps for a standard feature:
-
-1. Main session on **Sonnet**. Clarify the task with it first.
-2. **`planner`** (Opus) writes the plan. Read it, adjust it, approve it (gate 1).
-3. Main session writes the tests first, then implements the plan. A fix starts with a test that reproduces the bug, a refactor keeps the existing tests passing unchanged.
-4. Tests, using the project's own commands.
-5. Compare the diff with the plan's impact section.
-6. **`reviewer`** checks the diff. Add **`security-reviewer`** for auth, permissions or user input, **`silent-failure-hunter`** for error-heavy code, and **`database-reviewer`** for migrations and queries.
-7. Fix findings, then **`docs-sync`** updates the docs.
-8. Approve the commit (gate 2): only this task's files, with a message from the `commit-message` skill. No push unless you say so.
-
-Rules of thumb:
-
-- One session = one task. Start a new session for unrelated work.
-- Do not switch the main model for a single message, each switch rereads the whole context without cache.
-- Raise effort (`/effort xhigh`) for risky areas: auth, permissions, migrations, money, data loss.
-
-## Requirements
-
-- Claude Code
-- bash (Linux, macOS, or Git Bash on Windows) and git
-- `jq` for the hooks (without it, `readonly-git.sh` blocks every Bash call of the read-only agents and `guard-heavy-commands.sh` blocks heavy-looking commands)
-- Python 3 for rebuilding the `ecc-router` catalog and for the `ui-ux-pro-max` plugin
-- Node.js (`npm`) for the Codex CLI, only if you use the `codex` plugin
-
-## Install
-
-```bash
-git clone https://github.com/jakub-lgr/claude-setup ~/claude-setup
-~/claude-setup/install.sh
-~/claude-setup/scripts/install-plugins.sh
-```
-
-`install-plugins.sh` installs the plugins listed under [Plugins](#plugins) and the CLI tools they need. It skips anything already installed. Use `--dry-run` to see what it would do.
-
-**Windows:** run the scripts in Git Bash, which comes with Git for Windows (Claude Code needs it anyway). From PowerShell: `& "C:\Program Files\Git\bin\bash.exe" scripts/install-plugins.sh`.
-
-`install.sh` creates symlinks in `~/.claude/agents`, `~/.claude/skills` and `~/.claude/hooks`. It never overwrites an existing file that is not already a link into this repo. Update everywhere with `git pull`.
-
-## Per project
-
-Copy what you need from `templates/project/` into the project:
-
-- `CLAUDE.md`: the project rules the agents read.
-- `.claude/settings.json`: enables hooks for this project.
-- `.claude/heavy-commands.conf`: config for the heavy command guard (optional).
-
-## Skills
-
-### My skills
-
-| Skill | What it does |
-|---|---|
-| `dev` | Manual only (`/dev <task>`). One entry point for development work: classifies the task (feature, change, fix, refactor) and its size, then runs the matching workflow: clarify, plan with `planner`, gate 1, tests first, implement, check against the plan, review with the agents that apply, `docs-sync`, report with the agents that ran or were skipped, gate 2 (commit only this task's files, never push without asking). |
-| `commit-message` | Draft a commit message in the repo's own style, learned from `git log`. Suggests splitting mixed diffs. |
-| `pre-publish-check` | Before making a repo public: scan files and git history for secrets, personal data, internal hosts, domains and local paths. Read-only report. |
-| `ecc-router` | Manual only (`/ecc-router <task>`). Keeps [ECC](https://github.com/affaan-m/ecc) as a local archive (`~/ecc` or `$ECC_ARCHIVE`), suggests up to 10 matching agents, skills, commands or rules next to your own agents, waits for your confirmation, and uses the confirmed ones in the current session only. Nothing is installed. Rebuild its catalog after updating the archive: `python skills/ecc-router/build-catalog.py`. |
-
-### Third-party skills
-
-Public skills under open licenses, copied unchanged from their authors' repositories, each with its license in its folder. The exact commits are in `scripts/third-party-skills.lock`. Update them with `scripts/update-third-party-skills.sh` (all, or name the skills to update), then review the diff.
-
-| Source | Skills | License |
-|---|---|---|
-| [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | `high-end-visual-design`, `minimalist-ui`, `industrial-brutalist-ui`, `full-output-enforcement` | MIT |
-| [emilkowalski/skills](https://github.com/emilkowalski/skills) | `animate`, `animate-expo`, `animation-vocabulary`, `apple-design`, `emil-design-eng`, `find-animation-opportunities`, `improve-animations`, `mobile-native`, `review-animations` | MIT |
-| [vercel-labs/skills](https://github.com/vercel-labs/skills) | `find-skills` | MIT |
-| [NVIDIA/skillspector](https://github.com/NVIDIA/skillspector) | `skill-inspector` (full scans need the `skillspector` CLI, installed by `install-plugins.sh`) | Apache-2.0 |
-
-## Plugins
-
-Plugins are not copied into this repo. `scripts/install-plugins.sh` installs them from their own marketplaces, so they update the usual way.
-
-| Plugin | Source | License | Needs |
-|---|---|---|---|
-| `frontend-design` | [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | Apache-2.0 | – |
-| `ui-ux-pro-max` | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | MIT | Python 3 |
-| `codex` | [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) | Apache-2.0 | Codex CLI (installed by the script) and a one-time `codex login` |
-
-Optional plugins, not for coding. Installed only with `scripts/install-plugins.sh --personal`. Each adds 11 skills that can trigger on their own, so turn them off with `/plugin` in coding projects.
-
-| Plugin | Source | License | What it is for | Needs |
-|---|---|---|---|---|
-| `trader-skill` | [Jakeschincariol/trader-skill](https://github.com/Jakeschincariol/trader-skill) | MIT | Investing: copy a portfolio from 13F filings, news and Congress trade alerts, budget and risk checks, taxes, rebalancing. Orders only after an explicit yes, paper trading by default. | Python 3 |
-| `founder-skill` | [Jakeschincariol/founder-skill](https://github.com/Jakeschincariol/founder-skill) | MIT | Testing a business idea: board review, competitors, simulated buyer panel, pricing, unit economics, launch plan. Simulated buyers are a brainstorm, not market research. | Python 3 |
-
-## Hooks
-
-| Hook | What it does |
-|---|---|
-| `guard-heavy-commands.sh` | Blocks heavy commands (build, test suites…) unless they run through the project's wrapper, e.g. a memory-limiting script. Each part of a chained command must start with the wrapper itself. Does nothing in projects without `.claude/heavy-commands.conf`. Needs `jq`. |
-| `readonly-git.sh` | Used by the read-only agents through their frontmatter, nothing to enable. Allows only `git status`, `git diff` and `git log` in Bash, blocks everything else. |
-
-## Known issues
-
-- `install.sh` on Windows: Git Bash's `ln -s` copies files instead of linking them unless symlinks are enabled (Developer Mode and `MSYS=winsymlinks:nativestrict`). Copies are not updated by `git pull`.
-- `readonly-git.sh` is found through `~/.claude/hooks/`. If `install.sh` has not been run, the hook is missing and the read-only agents fall back to the instruction alone.
-- `guard-heavy-commands.sh` splits chained commands on `;`, `&&`, `|` and similar without understanding quotes, so a separator inside a quoted string can split a command in the wrong place. It errs on the side of blocking.
-
-## TODO
-
-- [ ] Keep tuning agent prompts on real tasks. First round done (all new agents, reviewer, silent-failure-hunter); `docs-sync` stays on haiku.
-- [ ] `release-checklist` and `new-project` skills (see `skills/README.md`).
-- [ ] Later: project-level parity reviewer template (compare a ported page with its legacy original).
-
-## Credits
-
-Some agents are adapted from or inspired by [ECC](https://github.com/affaan-m/ecc) (MIT), and the `ecc-router` catalog lists ECC's items with their descriptions. Third-party skills keep their own licenses. See `UPSTREAM.md` and `THIRD_PARTY_NOTICES.md`.
+- **Update third-party skills:** `scripts/update-third-party-skills.sh` (all, or name the skills), review `git diff`, commit, then bump the plugin's `version` in its `plugin.json` so installed copies update.
+- **Add a third-party skill:** add a line to `scripts/third-party-skills.conf` (`repo ref folder plugin name`), run the script, list it in this README and `THIRD_PARTY_NOTICES.md`.
+- **Add a plugin:** new folder under `plugins/` with `.claude-plugin/plugin.json`, add it to `.claude-plugin/marketplace.json`. An external plugin is only an entry with a `github` source.
+- **Check before pushing:** `claude plugin validate .` and `claude plugin validate plugins/<plugin>`.
 
 ## License
 
-MIT for this repo's own files, see `LICENSE`. Third-party skills in `skills/` are under their own licenses, included in each skill's folder.
+MIT for this repo's own files, see `LICENSE`. Third-party skills under `plugins/*/skills/` keep their own licenses, included in each skill's folder. See `UPSTREAM.md` and `THIRD_PARTY_NOTICES.md`.
