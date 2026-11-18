@@ -118,30 +118,36 @@ Update later with `/plugin marketplace update claude-setup`. New or updated plug
 
 ## Per project
 
-Install the bundles a project needs from inside the project folder, with project scope:
+Every bundle except `core` goes into the projects that need it. There are two ways; the first is the main one.
+
+### A) Copy the skills into the project (recommended)
+
+Needs a clone of this repo (`git clone https://github.com/jakub-lgr/claude-setup ~/claude-setup`) and bash (Git Bash on Windows).
+
+```bash
+~/claude-setup/scripts/sync-to-project.sh <project> emil-design ui-ux-pro-max
+```
+
+The script copies the skills of those bundles into `<project>/.claude/skills/` and records what it copied in `<project>/.claude/claude-setup.lock`. Commit both with the project. Then:
+
+- the skills work everywhere the project goes: other machines, **cloud sessions**, no install needed;
+- a rerun without bundle names updates **only the bundles this project has**: `~/claude-setup/scripts/sync-to-project.sh <project>` (run `git pull` in `~/claude-setup` first);
+- skills the project has of its own are never touched, the script refuses to overwrite them;
+- `--remove <project> <bundle>` takes a bundle out again, `--list` shows the bundles, `--dry-run` shows what would happen.
+
+Bundles from this repo are copied as they are checked out locally. External bundles (`ui-ux-pro-max`, listed in `scripts/external-bundles.conf`) are fetched from their own repository; their `${CLAUDE_PLUGIN_ROOT}` paths are rewritten to `.claude/skills/` so their scripts are found. Size: `emil-design` is small, `ui-ux-pro-max` adds about 10 MB (search database).
+
+### B) Install the plugin with project scope
+
+From inside the project folder:
 
 ```bash
 claude plugin install emil-design@claude-setup --scope project
-claude plugin install ui-ux-pro-max@claude-setup --scope project
 ```
 
-This enables the bundle in the project's `.claude/settings.json` only; other projects do not see it. Commit that file. To make the project work on a machine that has not added this marketplace yet, add the marketplace to the same file, then Claude Code offers to install what the project needs:
+This enables the bundle in the project's `.claude/settings.json` only, and needs the marketplace on every machine (add `extraKnownMarketplaces` with `jakub-lgr/claude-setup` to that file so Claude Code offers to install it). Whether cloud sessions install plugins from project settings is not verified, so prefer A for projects used in the cloud.
 
-```json
-{
-  "extraKnownMarketplaces": {
-    "claude-setup": {
-      "source": { "source": "github", "repo": "jakub-lgr/claude-setup" }
-    }
-  },
-  "enabledPlugins": {
-    "emil-design@claude-setup": true,
-    "ui-ux-pro-max@claude-setup": true
-  }
-}
-```
-
-Typical setups:
+### Typical setups
 
 | Project | Bundles |
 |---|---|
@@ -151,9 +157,7 @@ Typical setups:
 | Discord bot, server, API | nothing extra, `core` is enough |
 | Video | Tesseract installed in the project (see above), no bundle from here |
 
-Remove a bundle from a project with `claude plugin uninstall <plugin>@claude-setup --scope project`.
-
-**Cloud sessions** (Claude Code on the web) start from a fresh clone of the project, without this machine's global `core`. Whether they install plugins listed in the project's `.claude/settings.json` is not verified yet. Skills committed directly in the project's `.claude/skills/` always work there; a script that copies chosen bundles into a project is planned (see TODO).
+New or changed skills show up in a new session; start one if they do not appear.
 
 ## Layout
 
@@ -163,6 +167,8 @@ plugins/<plugin>/                 one bundle per folder
   .claude-plugin/plugin.json
   skills/<skill>/SKILL.md
 scripts/
+  sync-to-project.sh              copies chosen bundles into a project's .claude/skills/
+  external-bundles.conf           bundles fetched from other repos by sync-to-project.sh
   update-third-party-skills.sh    copies third-party skills into their plugin (+ .conf, .lock)
   install-skillspector.sh         CLI for full skill-inspector scans
 UPSTREAM.md                       everything taken or inspired from elsewhere
@@ -173,12 +179,8 @@ THIRD_PARTY_NOTICES.md            licenses of those sources
 
 - **Update third-party skills:** `scripts/update-third-party-skills.sh` (all, or name the skills), review `git diff`, commit, then bump the plugin's `version` in its `plugin.json` so installed copies update.
 - **Add a third-party skill:** add a line to `scripts/third-party-skills.conf` (`repo ref folder plugin name`), run the script, list it in this README and `THIRD_PARTY_NOTICES.md`.
-- **Add a plugin:** new folder under `plugins/` with `.claude-plugin/plugin.json`, add it to `.claude-plugin/marketplace.json`. An external plugin is only an entry with a `github` source.
+- **Add a plugin:** new folder under `plugins/` with `.claude-plugin/plugin.json`, add it to `.claude-plugin/marketplace.json`. An external plugin is only an entry with a `github` source, plus a line in `scripts/external-bundles.conf` so `sync-to-project.sh` can copy it.
 - **Check before pushing:** `claude plugin validate .` and `claude plugin validate plugins/<plugin>`.
-
-## TODO
-
-- [ ] `scripts/sync-to-project.sh`: copy chosen bundles into a project's `.claude/skills/` and update only those bundles on rerun, so they work in cloud sessions too.
 
 ## License
 
