@@ -7,7 +7,7 @@ My personal Claude Code setup as a **plugin marketplace**: skill bundles that I 
 ## Idea
 
 - **Bundles, not one big global install.** Every plugin is a bundle of skills for one kind of work. A disabled plugin is not loaded at all, so its skills cannot trigger by mistake in the wrong project.
-- **Off globally, on per project.** Install the plugins once per machine, keep everything except `core` disabled in `~/.claude/settings.json`, and enable the bundles a project needs in that project's `.claude/settings.json`. Project settings win over user settings.
+- **Only `core` is global.** `core` is installed once per machine and is on everywhere. Every other bundle is installed per project, so it exists only in the projects that need it and nowhere else.
 - **One copy of every skill.** Skills live here, not copied into each project, so an update reaches every project at once.
 - **Third-party work is reused only under its license.** Skills from other authors are copied unchanged with their `LICENSE`; plugins that have their own repository are referenced, not copied.
 
@@ -94,14 +94,13 @@ Or from a terminal (needs Node.js): `npx skills add mirage-hq/Tesseract`. The sk
 
 ## Install
 
-Once per machine, in Claude Code:
+Once per machine, install only `core`. It is the only bundle meant to be on everywhere.
+
+In Claude Code:
 
 ```text
 /plugin marketplace add jakub-lgr/claude-setup
 /plugin install core@claude-setup
-/plugin install emil-design@claude-setup
-/plugin install ui-ux-pro-max@claude-setup
-/plugin install ios@claude-setup
 ```
 
 Or from a terminal:
@@ -109,51 +108,52 @@ Or from a terminal:
 ```bash
 claude plugin marketplace add jakub-lgr/claude-setup
 claude plugin install core@claude-setup
-claude plugin install emil-design@claude-setup
-claude plugin install ui-ux-pro-max@claude-setup
-claude plugin install ios@claude-setup
 ```
 
-Then switch the bundles **off globally**, so only `core` is on everywhere:
+Do **not** install the other bundles globally. They are installed per project, see below.
 
-```bash
-claude plugin disable emil-design@claude-setup --scope user
-claude plugin disable ui-ux-pro-max@claude-setup --scope user
-claude plugin disable ios@claude-setup --scope user
-```
+Optional, for full `skill-inspector` scans: `scripts/install-skillspector.sh` (Git Bash on Windows). Without it the skill still reviews the source.
 
-Optional, for full `skill-inspector` scans: `scripts/install-skillspector.sh` (Git Bash on Windows).
-
-Update everything later with `/plugin marketplace update claude-setup`.
+Update later with `/plugin marketplace update claude-setup`. New or updated plugins are loaded when a new session starts.
 
 ## Per project
 
-Enable the bundles a project needs, from inside the project folder:
+Install the bundles a project needs from inside the project folder, with project scope:
 
 ```bash
-claude plugin enable emil-design@claude-setup --scope project
+claude plugin install emil-design@claude-setup --scope project
+claude plugin install ui-ux-pro-max@claude-setup --scope project
 ```
 
-This writes `.claude/settings.json` in the project. Commit it, and on another machine Claude Code offers to install whatever the project needs. Typical setups:
-
-| Project | `.claude/settings.json` |
-|---|---|
-| Website / web app | `emil-design`, `ui-ux-pro-max` |
-| React Native / Expo app | `emil-design` |
-| iOS app in Xcode | `ios` (+ `emil-design` for `apple-design`, `gestures`) |
-| Discord bot, server, API | nothing extra, `core` is enough |
-| Video | Tesseract installed in the project (see above) |
-
-Example for a website:
+This enables the bundle in the project's `.claude/settings.json` only; other projects do not see it. Commit that file. To make the project work on a machine that has not added this marketplace yet, add the marketplace to the same file, then Claude Code offers to install what the project needs:
 
 ```json
 {
+  "extraKnownMarketplaces": {
+    "claude-setup": {
+      "source": { "source": "github", "repo": "jakub-lgr/claude-setup" }
+    }
+  },
   "enabledPlugins": {
     "emil-design@claude-setup": true,
     "ui-ux-pro-max@claude-setup": true
   }
 }
 ```
+
+Typical setups:
+
+| Project | Bundles |
+|---|---|
+| Website / web app | `emil-design`, `ui-ux-pro-max` |
+| React Native / Expo app | `emil-design` |
+| iOS app in Xcode | `ios` (+ `emil-design` for `apple-design`, `gestures`) |
+| Discord bot, server, API | nothing extra, `core` is enough |
+| Video | Tesseract installed in the project (see above), no bundle from here |
+
+Remove a bundle from a project with `claude plugin uninstall <plugin>@claude-setup --scope project`.
+
+**Cloud sessions** (Claude Code on the web) start from a fresh clone of the project, without this machine's global `core`. Whether they install plugins listed in the project's `.claude/settings.json` is not verified yet. Skills committed directly in the project's `.claude/skills/` always work there; a script that copies chosen bundles into a project is planned (see TODO).
 
 ## Layout
 
@@ -175,6 +175,10 @@ THIRD_PARTY_NOTICES.md            licenses of those sources
 - **Add a third-party skill:** add a line to `scripts/third-party-skills.conf` (`repo ref folder plugin name`), run the script, list it in this README and `THIRD_PARTY_NOTICES.md`.
 - **Add a plugin:** new folder under `plugins/` with `.claude-plugin/plugin.json`, add it to `.claude-plugin/marketplace.json`. An external plugin is only an entry with a `github` source.
 - **Check before pushing:** `claude plugin validate .` and `claude plugin validate plugins/<plugin>`.
+
+## TODO
+
+- [ ] `scripts/sync-to-project.sh`: copy chosen bundles into a project's `.claude/skills/` and update only those bundles on rerun, so they work in cloud sessions too.
 
 ## License
 
